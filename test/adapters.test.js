@@ -38,13 +38,13 @@ function test_maps_not_present_to_idle_status() {
 }
 
 function test_builds_enable_command() {
-  const cmd = buildToggleCommand('12', true);
-  assert.strictEqual(cmd, "Enable-NetAdapter -InterfaceIndex 12 -Confirm:$false");
+  const cmd = buildToggleCommand('Wi-Fi', true);
+  assert.strictEqual(cmd, 'Enable-NetAdapter -Name "Wi-Fi" -Confirm:$false');
 }
 
 function test_builds_disable_command() {
-  const cmd = buildToggleCommand('15', false);
-  assert.strictEqual(cmd, "Disable-NetAdapter -InterfaceIndex 15 -Confirm:$false");
+  const cmd = buildToggleCommand('Ethernet', false);
+  assert.strictEqual(cmd, 'Disable-NetAdapter -Name "Ethernet" -Confirm:$false');
 }
 
 module.exports = {

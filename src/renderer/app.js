@@ -49,8 +49,12 @@ function buildAdapterCard(adapter, { compact }) {
     toggle.dataset.on = String(adapter.status === 'up');
     toggle.onclick = async (ev) => {
       ev.stopPropagation();
-      await window.api.adapters.toggle(adapter.id, adapter.status !== 'up');
-      await refreshAdapters();
+      try {
+        await window.api.adapters.toggle(adapter.name, adapter.status !== 'up');
+        await refreshAdapters();
+      } catch (err) {
+        window.alert(t('error.toggleFailed'));
+      }
     };
     el.appendChild(toggle);
 

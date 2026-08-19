@@ -38,13 +38,13 @@ async function listAdapters() {
   return parseAdaptersJson(json);
 }
 
-function buildToggleCommand(id, enable) {
+function buildToggleCommand(name, enable) {
   const verb = enable ? 'Enable-NetAdapter' : 'Disable-NetAdapter';
-  return `${verb} -InterfaceIndex ${id} -Confirm:$false`;
+  return `${verb} -Name "${name}" -Confirm:$false`;
 }
 
-async function toggleAdapter(id, enable) {
-  await runPowerShell(buildToggleCommand(id, enable));
+async function toggleAdapter(name, enable) {
+  await runPowerShell(buildToggleCommand(name, enable));
 }
 
 module.exports = { parseAdaptersJson, listAdapters, buildToggleCommand, toggleAdapter };

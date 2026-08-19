@@ -1,5 +1,5 @@
 {
-  "app.title": "NetworkAdapterManager",
+  "app.title": "AdapterManager",
   "auto.title": "Auto Mode",
   "auto.subtitle": "Wi-Fi turns off automatically when Ethernet connects",
   "section.adapters": "Adapters",
@@ -31,5 +31,6 @@
   "settings.upToDate": "You're up to date",
   "settings.updateFound": "New version found:",
   "settings.confirmUpdate": "Do you want to update to version",
-  "settings.installing": "Downloading and installing…"
+  "settings.installing": "Downloading and installing…",
+  "error.toggleFailed": "Couldn't change adapter status. Make sure the app is running as Administrator."
 }

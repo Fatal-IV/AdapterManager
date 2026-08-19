@@ -1,5 +1,5 @@
 {
-  "app.title": "NetworkAdapterManager",
+  "app.title": "AdapterManager",
   "auto.title": "Otomatik Mod",
   "auto.subtitle": "Ethernet bağlandığında Wi-Fi otomatik olarak kapanır",
   "section.adapters": "Adaptörler",
@@ -31,5 +31,6 @@
   "settings.upToDate": "En güncel sürümdesiniz",
   "settings.updateFound": "Yeni sürüm bulundu:",
   "settings.confirmUpdate": "Şu sürüme güncellemek istiyor musunuz?",
-  "settings.installing": "İndiriliyor ve kuruluyor…"
+  "settings.installing": "İndiriliyor ve kuruluyor…",
+  "error.toggleFailed": "Adaptör durumu değiştirilemedi. Uygulamayı yönetici olarak çalıştırdığınızdan emin olun."
 }
