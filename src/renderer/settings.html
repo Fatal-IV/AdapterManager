@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <title>Ayarlar</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app">
+    <div class="toolbar">
+      <div class="toolbar-title">
+        <button class="icon-btn" id="backBtn">
+          <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+        </button>
+        <span data-i18n="settings.title">Ayarlar</span>
+      </div>
+    </div>
+    <main>
+      <div class="section-label" data-i18n="settings.appearance">Görünüm</div>
+      <div class="segmented" id="themeSwitch">
+        <button data-value="light" data-i18n="settings.theme.light">Açık</button>
+        <button data-value="dark" data-i18n="settings.theme.dark">Koyu</button>
+        <button data-value="system" class="active" data-i18n="settings.theme.system">Sistem</button>
+      </div>
+
+      <div class="section-label" data-i18n="settings.system">Sistem</div>
+      <div class="auto-card">
+        <div class="auto-copy">
+          <h3 data-i18n="settings.autostart">Windows başlangıcında otomatik başlat</h3>
+        </div>
+        <button class="switch" id="autostartSwitch" data-on="true"></button>
+      </div>
+
+      <div class="section-label" data-i18n="settings.updates">Güncellemeler</div>
+      <div class="auto-card">
+        <div class="auto-copy">
+          <h3 id="updateStatus" data-i18n="settings.checkUpdates">Güncellemeleri Denetle</h3>
+        </div>
+        <button class="wifi-scan-btn" id="checkUpdateBtn" data-i18n="settings.check">Denetle</button>
+      </div>
+    </main>
+  </div>
+  <script src="i18n.js"></script>
+  <script src="settings.js"></script>
+</body>
+</html>

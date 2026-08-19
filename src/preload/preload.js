@@ -17,5 +17,9 @@ contextBridge.exposeInMainWorld('api', {
   wifi: {
     scan: () => ipcRenderer.invoke('wifi:scan'),
     connect: (ssid, password) => ipcRenderer.invoke('wifi:connect', { ssid, password })
+  },
+  settings: {
+    get: () => ipcRenderer.invoke('settings:get'),
+    set: (partial) => ipcRenderer.invoke('settings:set', partial)
   }
 });

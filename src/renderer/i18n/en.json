@@ -16,5 +16,15 @@
   "tab.wifi": "Networks",
   "wifi.scan": "Scan Networks",
   "wifi.connected": "Connected",
-  "footer.adminNotice": "Running as Administrator"
+  "footer.adminNotice": "Running as Administrator",
+  "settings.title": "Settings",
+  "settings.appearance": "Appearance",
+  "settings.theme.light": "Light",
+  "settings.theme.dark": "Dark",
+  "settings.theme.system": "System",
+  "settings.system": "System",
+  "settings.autostart": "Launch automatically at Windows startup",
+  "settings.updates": "Updates",
+  "settings.checkUpdates": "Check for Updates",
+  "settings.check": "Check"
 }

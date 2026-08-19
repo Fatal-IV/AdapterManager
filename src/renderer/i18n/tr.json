@@ -16,5 +16,15 @@
   "tab.wifi": "Ağlar",
   "wifi.scan": "Ağları Tara",
   "wifi.connected": "Bağlı",
-  "footer.adminNotice": "Yönetici olarak çalışıyor"
+  "footer.adminNotice": "Yönetici olarak çalışıyor",
+  "settings.title": "Ayarlar",
+  "settings.appearance": "Görünüm",
+  "settings.theme.light": "Açık",
+  "settings.theme.dark": "Koyu",
+  "settings.theme.system": "Sistem",
+  "settings.system": "Sistem",
+  "settings.autostart": "Windows başlangıcında otomatik başlat",
+  "settings.updates": "Güncellemeler",
+  "settings.checkUpdates": "Güncellemeleri Denetle",
+  "settings.check": "Denetle"
 }

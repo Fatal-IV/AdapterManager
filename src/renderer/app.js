@@ -174,6 +174,10 @@ function closeDrawer() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+  window.api.settings.get().then((s) => {
+    if (s.theme !== 'system') document.documentElement.dataset.theme = s.theme;
+  });
+
   document.querySelectorAll('.tab').forEach((tab) => {
     tab.addEventListener('click', () => {
       document.querySelectorAll('.tab').forEach((t) => t.classList.remove('active'));
@@ -187,6 +191,9 @@ document.addEventListener('DOMContentLoaded', () => {
   document.querySelector('.sheet-close').addEventListener('click', closeSheet);
   document.getElementById('scrim').addEventListener('click', closeSheet);
   document.querySelector('.icon-btn[title="Menü"]').addEventListener('click', openDrawer);
+  document.getElementById('settingsBtn').addEventListener('click', () => {
+    window.location.href = 'settings.html';
+  });
   document.getElementById('drawerScrim').addEventListener('click', closeDrawer);
   document.querySelector('.drawer .icon-btn').addEventListener('click', closeDrawer);
 
