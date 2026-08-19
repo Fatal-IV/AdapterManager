@@ -1,5 +1,10 @@
-const { app, BrowserWindow } = require('electron');
+const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
+const { listAdapters } = require('./services/adapters');
+
+ipcMain.handle('adapters:list', async () => {
+  return listAdapters();
+});
 
 let mainWindow = null;
 

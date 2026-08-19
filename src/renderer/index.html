@@ -8,8 +8,10 @@
   <h1>NetworkAdapterManager</h1>
   <p id="status">Yükleniyor…</p>
   <script>
-    document.getElementById('status').textContent =
-      typeof window.api === 'object' ? 'api köprüsü hazır' : 'api köprüsü YOK';
+    window.api.adapters.list().then((adapters) => {
+      document.getElementById('status').textContent =
+        adapters.map(a => `${a.name} (${a.status})`).join(', ') || 'Adaptör bulunamadı';
+    });
   </script>
 </body>
 </html>
