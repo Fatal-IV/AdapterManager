@@ -1,5 +1,6 @@
 const modules = [
-  require('./adapters.test.js')
+  require('./adapters.test.js'),
+  require('./network.test.js')
 ];
 
 let failures = 0;
