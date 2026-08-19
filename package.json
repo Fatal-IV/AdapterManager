@@ -1,0 +1,28 @@
+{
+  "name": "adaptermanager",
+  "version": "0.1.0",
+  "description": "NetworkAdapterManager",
+  "main": "src/main/index.js",
+  "scripts": {
+    "start": "electron .",
+    "test": "node test/run-all.js",
+    "pack": "electron-builder --dir"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "build": {
+    "appId": "com.iksoftware.adaptermanager",
+    "productName": "NetworkAdapterManager",
+    "win": {
+      "target": "dir",
+      "requestedExecutionLevel": "requireAdmin"
+    },
+    "directories": { "output": "publish" }
+  },
+  "devDependencies": {
+    "electron": "^43.4.1",
+    "electron-builder": "^26.15.3"
+  }
+}

@@ -1,0 +1,15 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <title>NetworkAdapterManager</title>
+</head>
+<body>
+  <h1>NetworkAdapterManager</h1>
+  <p id="status">Yükleniyor…</p>
+  <script>
+    document.getElementById('status').textContent =
+      typeof window.api === 'object' ? 'api köprüsü hazır' : 'api köprüsü YOK';
+  </script>
+</body>
+</html>
