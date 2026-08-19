@@ -12,7 +12,16 @@ contextBridge.exposeInMainWorld('api', {
     getIp: (name) => ipcRenderer.invoke('network:getIp', name),
     setIp: (name, config) => ipcRenderer.invoke('network:setIp', { id: name, config }),
     getProxy: () => ipcRenderer.invoke('network:getProxy'),
-    setProxy: (config) => ipcRenderer.invoke('network:setProxy', config)
+    setProxy: (config) => ipcRenderer.invoke('network:setProxy', config),
+    getProfile: (name) => ipcRenderer.invoke('network:getProfile', name),
+    getIpv6: (name) => ipcRenderer.invoke('network:getIpv6', name),
+    openGateway: (gatewayIp) => ipcRenderer.invoke('network:openGateway', gatewayIp)
+  },
+  diagnostics: {
+    ping: (host) => ipcRenderer.invoke('diagnostics:ping', host),
+    dnsTiming: () => ipcRenderer.invoke('diagnostics:dnsTiming'),
+    downloadSpeed: () => ipcRenderer.invoke('diagnostics:downloadSpeed'),
+    uploadSpeed: () => ipcRenderer.invoke('diagnostics:uploadSpeed')
   },
   wifi: {
     scan: () => ipcRenderer.invoke('wifi:scan'),

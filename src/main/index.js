@@ -1,8 +1,12 @@
-const { app, BrowserWindow, ipcMain, Menu } = require('electron');
+const { app, BrowserWindow, ipcMain, Menu, shell } = require('electron');
 const path = require('path');
 const { listAdapters, toggleAdapter } = require('./services/adapters');
 const { getIpConfig, setIpConfig, getProxyConfig, setProxyConfig } = require('./services/network');
 const { scanWifi, connectWifi } = require('./services/wifi');
+const {
+  pingHost, getNetworkProfile, getIpv6Address,
+  measureDnsLookup, measureDownloadSpeed, measureUploadSpeed
+} = require('./services/diagnostics');
 const { resolveLocale } = require('./services/i18n');
 const { getSettings, setSettings } = require('./settings');
 const { startAutoMode, stopAutoMode, isAutoModeRunning } = require('./autoMode');
@@ -44,6 +48,17 @@ ipcMain.handle('wifi:scan', async () => scanWifi());
 ipcMain.handle('wifi:connect', async (_event, { ssid, password }) => {
   await connectWifi(ssid, password);
 });
+
+ipcMain.handle('network:getProfile', async (_event, name) => getNetworkProfile(name));
+ipcMain.handle('network:getIpv6', async (_event, name) => getIpv6Address(name));
+ipcMain.handle('network:openGateway', async (_event, gatewayIp) => {
+  await shell.openExternal(`http://${gatewayIp}`);
+});
+
+ipcMain.handle('diagnostics:ping', async (_event, host) => pingHost(host));
+ipcMain.handle('diagnostics:dnsTiming', async () => measureDnsLookup());
+ipcMain.handle('diagnostics:downloadSpeed', async () => measureDownloadSpeed());
+ipcMain.handle('diagnostics:uploadSpeed', async () => measureUploadSpeed());
 
 ipcMain.handle('autoMode:get', async () => isAutoModeRunning());
 ipcMain.handle('autoMode:set', async (_event, enabled) => {
