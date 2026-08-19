@@ -7,9 +7,9 @@ let currentAdapters = [];
 let activeSheetAdapter = null;
 
 function statusLabel(status) {
-  if (status === 'up') return 'Bağlı';
-  if (status === 'down') return 'Devre dışı';
-  return 'Bağlı değil';
+  if (status === 'up') return t('status.up');
+  if (status === 'down') return t('status.down');
+  return t('status.idle');
 }
 
 function buildAdapterCard(adapter, { compact }) {
@@ -119,7 +119,7 @@ async function fillWifiPanel(adapter) {
   networks.forEach((n) => {
     const row = document.createElement('div');
     row.className = 'wifi-row' + (n.connected ? ' connected' : '');
-    row.innerHTML = `<span class="name">${n.ssid}</span>${n.connected ? '<span class="connected-tag">Bağlı</span>' : ''}`;
+    row.innerHTML = `<span class="name">${n.ssid}</span>${n.connected ? `<span class="connected-tag">${t('wifi.connected')}</span>` : ''}`;
     row.onclick = async () => {
       if (n.connected) return;
       const password = window.prompt(`"${n.ssid}" için şifre:`);
@@ -211,5 +211,8 @@ document.addEventListener('DOMContentLoaded', () => {
     applyDrawerFilter();
   }));
 
-  refreshAdapters();
+  loadI18n().then(() => {
+    applyI18n();
+    refreshAdapters();
+  });
 });

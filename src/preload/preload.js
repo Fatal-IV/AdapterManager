@@ -1,6 +1,9 @@
 const { contextBridge, ipcRenderer } = require('electron');
 
+const locale = ipcRenderer.sendSync('app:locale');
+
 contextBridge.exposeInMainWorld('api', {
+  locale,
   adapters: {
     list: () => ipcRenderer.invoke('adapters:list'),
     toggle: (id, enable) => ipcRenderer.invoke('adapters:toggle', { id, enable })

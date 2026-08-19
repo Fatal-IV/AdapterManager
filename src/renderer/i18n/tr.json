@@ -1,0 +1,20 @@
+{
+  "app.title": "NetworkAdapterManager",
+  "auto.title": "Otomatik Mod",
+  "auto.subtitle": "Ethernet bağlandığında Wi-Fi otomatik olarak kapanır",
+  "section.adapters": "Adaptörler",
+  "status.up": "Bağlı",
+  "status.down": "Devre dışı",
+  "status.idle": "Bağlı değil",
+  "drawer.title": "Adaptörler",
+  "drawer.search": "Adaptör ara…",
+  "filter.all": "Tümü",
+  "filter.active": "Aktif",
+  "filter.inactive": "Pasif",
+  "tab.ip": "IP / DNS",
+  "tab.proxy": "Proxy",
+  "tab.wifi": "Ağlar",
+  "wifi.scan": "Ağları Tara",
+  "wifi.connected": "Bağlı",
+  "footer.adminNotice": "Yönetici olarak çalışıyor"
+}

@@ -1,0 +1,20 @@
+{
+  "app.title": "NetworkAdapterManager",
+  "auto.title": "Auto Mode",
+  "auto.subtitle": "Wi-Fi turns off automatically when Ethernet connects",
+  "section.adapters": "Adapters",
+  "status.up": "Connected",
+  "status.down": "Disabled",
+  "status.idle": "Not connected",
+  "drawer.title": "Adapters",
+  "drawer.search": "Search adapters…",
+  "filter.all": "All",
+  "filter.active": "Active",
+  "filter.inactive": "Inactive",
+  "tab.ip": "IP / DNS",
+  "tab.proxy": "Proxy",
+  "tab.wifi": "Networks",
+  "wifi.scan": "Scan Networks",
+  "wifi.connected": "Connected",
+  "footer.adminNotice": "Running as Administrator"
+}

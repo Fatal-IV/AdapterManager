@@ -3,6 +3,11 @@ const path = require('path');
 const { listAdapters, toggleAdapter } = require('./services/adapters');
 const { getIpConfig, setIpConfig, getProxyConfig, setProxyConfig } = require('./services/network');
 const { scanWifi, connectWifi } = require('./services/wifi');
+const { resolveLocale } = require('./services/i18n');
+
+ipcMain.on('app:locale', (event) => {
+  event.returnValue = resolveLocale(app.getLocale());
+});
 
 ipcMain.handle('adapters:list', async () => {
   return listAdapters();
