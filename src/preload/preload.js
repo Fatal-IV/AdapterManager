@@ -10,5 +10,9 @@ contextBridge.exposeInMainWorld('api', {
     setIp: (name, config) => ipcRenderer.invoke('network:setIp', { id: name, config }),
     getProxy: () => ipcRenderer.invoke('network:getProxy'),
     setProxy: (config) => ipcRenderer.invoke('network:setProxy', config)
+  },
+  wifi: {
+    scan: () => ipcRenderer.invoke('wifi:scan'),
+    connect: (ssid, password) => ipcRenderer.invoke('wifi:connect', { ssid, password })
   }
 });

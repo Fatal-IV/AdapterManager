@@ -1,6 +1,7 @@
 const modules = [
   require('./adapters.test.js'),
-  require('./network.test.js')
+  require('./network.test.js'),
+  require('./wifi.test.js')
 ];
 
 let failures = 0;

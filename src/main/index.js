@@ -2,6 +2,7 @@ const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
 const { listAdapters, toggleAdapter } = require('./services/adapters');
 const { getIpConfig, setIpConfig, getProxyConfig, setProxyConfig } = require('./services/network');
+const { scanWifi, connectWifi } = require('./services/wifi');
 
 ipcMain.handle('adapters:list', async () => {
   return listAdapters();
@@ -22,6 +23,11 @@ ipcMain.handle('network:getProxy', async () => getProxyConfig());
 ipcMain.handle('network:setProxy', async (_event, config) => {
   await setProxyConfig(config);
   return getProxyConfig();
+});
+
+ipcMain.handle('wifi:scan', async () => scanWifi());
+ipcMain.handle('wifi:connect', async (_event, { ssid, password }) => {
+  await connectWifi(ssid, password);
 });
 
 let mainWindow = null;
