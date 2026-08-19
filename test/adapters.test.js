@@ -1,5 +1,5 @@
 const assert = require('assert');
-const { parseAdaptersJson } = require('../src/main/services/adapters');
+const { parseAdaptersJson, buildToggleCommand } = require('../src/main/services/adapters');
 
 function test_parses_single_adapter_object() {
   const raw = JSON.stringify({
@@ -37,8 +37,20 @@ function test_maps_not_present_to_idle_status() {
   assert.strictEqual(result[0].status, 'idle');
 }
 
+function test_builds_enable_command() {
+  const cmd = buildToggleCommand('12', true);
+  assert.strictEqual(cmd, "Enable-NetAdapter -InterfaceIndex 12 -Confirm:$false");
+}
+
+function test_builds_disable_command() {
+  const cmd = buildToggleCommand('15', false);
+  assert.strictEqual(cmd, "Disable-NetAdapter -InterfaceIndex 15 -Confirm:$false");
+}
+
 module.exports = {
   test_parses_single_adapter_object,
   test_parses_multiple_adapters_array,
-  test_maps_not_present_to_idle_status
+  test_maps_not_present_to_idle_status,
+  test_builds_enable_command,
+  test_builds_disable_command
 };

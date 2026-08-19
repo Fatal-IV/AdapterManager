@@ -1,8 +1,13 @@
 const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
-const { listAdapters } = require('./services/adapters');
+const { listAdapters, toggleAdapter } = require('./services/adapters');
 
 ipcMain.handle('adapters:list', async () => {
+  return listAdapters();
+});
+
+ipcMain.handle('adapters:toggle', async (_event, { id, enable }) => {
+  await toggleAdapter(id, enable);
   return listAdapters();
 });
 

@@ -8,10 +8,24 @@
   <h1>NetworkAdapterManager</h1>
   <p id="status">Yükleniyor…</p>
   <script>
-    window.api.adapters.list().then((adapters) => {
-      document.getElementById('status').textContent =
-        adapters.map(a => `${a.name} (${a.status})`).join(', ') || 'Adaptör bulunamadı';
-    });
+    async function render() {
+      const adapters = await window.api.adapters.list();
+      const el = document.getElementById('status');
+      el.innerHTML = '';
+      adapters.forEach((a) => {
+        const row = document.createElement('div');
+        const btn = document.createElement('button');
+        btn.textContent = a.status === 'down' ? 'Etkinleştir' : 'Devre Dışı Bırak';
+        btn.onclick = async () => {
+          await window.api.adapters.toggle(a.id, a.status === 'down');
+          render();
+        };
+        row.textContent = `${a.name} (${a.status}) `;
+        row.appendChild(btn);
+        el.appendChild(row);
+      });
+    }
+    render();
   </script>
 </body>
 </html>

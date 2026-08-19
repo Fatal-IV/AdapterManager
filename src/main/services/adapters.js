@@ -38,4 +38,13 @@ async function listAdapters() {
   return parseAdaptersJson(json);
 }
 
-module.exports = { parseAdaptersJson, listAdapters };
+function buildToggleCommand(id, enable) {
+  const verb = enable ? 'Enable-NetAdapter' : 'Disable-NetAdapter';
+  return `${verb} -InterfaceIndex ${id} -Confirm:$false`;
+}
+
+async function toggleAdapter(id, enable) {
+  await runPowerShell(buildToggleCommand(id, enable));
+}
+
+module.exports = { parseAdaptersJson, listAdapters, buildToggleCommand, toggleAdapter };
