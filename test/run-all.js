@@ -5,7 +5,8 @@ const modules = [
   require('./i18n.test.js'),
   require('./settings.test.js'),
   require('./autoMode.test.js'),
-  require('./updater.test.js')
+  require('./updater.test.js'),
+  require('./diagnostics.test.js')
 ];
 
 let failures = 0;
