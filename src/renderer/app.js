@@ -6,6 +6,20 @@ const GLYPHS = {
 let currentAdapters = [];
 let activeSheetAdapter = null;
 
+const CATEGORY_LABELS = {
+  public: 'detail.categoryPublic',
+  private: 'detail.categoryPrivate',
+  domain: 'detail.categoryDomain'
+};
+
+function formatMbps(result) {
+  return result && typeof result.mbps === 'number' ? `${result.mbps.toFixed(1)} Mbps` : t('detail.unavailable');
+}
+
+function formatMs(result) {
+  return result && typeof (result.avgMs ?? result.ms) === 'number' ? `${result.avgMs ?? result.ms} ms` : t('detail.unavailable');
+}
+
 function statusLabel(status) {
   if (status === 'up') return t('status.up');
   if (status === 'down') return t('status.down');
@@ -17,7 +31,7 @@ function buildAdapterCard(adapter, { compact }) {
   el.className = compact ? 'drawer-row' : 'adapter-card';
   el.dataset.status = adapter.status;
   el.onclick = () => {
-    openDetailSheet(adapter);
+    openDetailView(adapter);
     if (compact) closeDrawer();
   };
 
@@ -135,7 +149,7 @@ async function fillWifiPanel(adapter) {
   });
 }
 
-async function openDetailSheet(adapter) {
+async function openEditSheet(adapter) {
   activeSheetAdapter = adapter;
   document.getElementById('sheetGlyph').innerHTML = GLYPHS[adapter.type] || GLYPHS.ethernet;
   document.getElementById('sheetTitle').textContent = adapter.name;
@@ -167,6 +181,96 @@ function closeSheet() {
   activeSheetAdapter = null;
 }
 
+async function findConnectedSsid() {
+  try {
+    const networks = await window.api.wifi.scan();
+    const connected = networks.find((n) => n.connected);
+    return connected ? connected.ssid : '';
+  } catch {
+    return '';
+  }
+}
+
+function copyToClipboard(text, el) {
+  navigator.clipboard.writeText(text).then(() => {
+    const original = el.textContent;
+    el.textContent = t('detail.copied');
+    setTimeout(() => { el.textContent = original; }, 1200);
+  });
+}
+
+async function openDetailView(adapter) {
+  document.getElementById('listView').style.display = 'none';
+  const view = document.getElementById('detailView');
+  view.classList.add('active');
+
+  document.getElementById('detailGlyph').innerHTML = GLYPHS[adapter.type] || GLYPHS.ethernet;
+  document.getElementById('detailTitle').textContent = adapter.name;
+  document.getElementById('detailStatus').textContent = statusLabel(adapter.status);
+  document.getElementById('detailMac').textContent = adapter.mac;
+  document.getElementById('detailNetworkName').textContent = adapter.name;
+  document.getElementById('detailCategory').textContent = '—';
+  document.getElementById('detailDns').textContent = '—';
+  document.getElementById('detailIp').textContent = '—';
+  document.getElementById('detailGateway').textContent = '—';
+  document.getElementById('detailIpv6').textContent = '—';
+  document.getElementById('detailDownload').textContent = t('detail.measuring');
+  document.getElementById('detailUpload').textContent = t('detail.measuring');
+  document.getElementById('detailPing').textContent = t('detail.measuring');
+
+  document.getElementById('detailMac').onclick = () => copyToClipboard(adapter.mac, document.getElementById('detailMac'));
+  document.getElementById('editIpDnsBtn').onclick = () => openEditSheet(adapter);
+  document.getElementById('modemBtn').onclick = async () => {
+    const cfg = await window.api.network.getIp(adapter.name);
+    if (cfg.gateway) window.api.network.openGateway(cfg.gateway);
+  };
+  document.getElementById('diagnoseBtn').onclick = () => openDiagModal(adapter);
+
+  const [ipCfg, profile, ipv6, networkName] = await Promise.all([
+    window.api.network.getIp(adapter.name),
+    window.api.network.getProfile(adapter.name),
+    window.api.network.getIpv6(adapter.name),
+    adapter.type === 'wifi' ? findConnectedSsid() : Promise.resolve(adapter.name)
+  ]);
+  document.getElementById('detailNetworkName').textContent = networkName || adapter.name;
+  document.getElementById('detailCategory').textContent = t(CATEGORY_LABELS[profile.category]);
+  document.getElementById('detailDns').textContent = (ipCfg.dns && ipCfg.dns.length) ? ipCfg.dns.join(', ') : t('detail.unavailable');
+  document.getElementById('detailIp').textContent = ipCfg.ip || t('detail.unavailable');
+  document.getElementById('detailGateway').textContent = ipCfg.gateway || t('detail.unavailable');
+  document.getElementById('detailIpv6').textContent = ipv6 || t('detail.unavailable');
+
+  window.api.diagnostics.downloadSpeed().then((r) => { document.getElementById('detailDownload').textContent = formatMbps(r); });
+  window.api.diagnostics.uploadSpeed().then((r) => { document.getElementById('detailUpload').textContent = formatMbps(r); });
+  window.api.diagnostics.ping('8.8.8.8').then((r) => { document.getElementById('detailPing').textContent = formatMs(r); });
+}
+
+function closeDetailView() {
+  document.getElementById('detailView').classList.remove('active');
+  document.getElementById('listView').style.display = '';
+}
+
+async function openDiagModal(adapter) {
+  document.getElementById('diagGateway').textContent = t('detail.measuring');
+  document.getElementById('diagDns').textContent = t('detail.measuring');
+  document.getElementById('diagInternet').textContent = t('detail.measuring');
+  document.getElementById('diagModal').classList.add('open');
+  document.getElementById('diagScrim').classList.add('open');
+
+  const ipCfg = await window.api.network.getIp(adapter.name);
+  if (ipCfg.gateway) {
+    window.api.diagnostics.ping(ipCfg.gateway).then((r) => { document.getElementById('diagGateway').textContent = formatMs(r); });
+  } else {
+    document.getElementById('diagGateway').textContent = t('detail.unavailable');
+  }
+  window.api.diagnostics.dnsTiming().then((r) => { document.getElementById('diagDns').textContent = formatMs(r); });
+  window.api.diagnostics.ping('8.8.8.8').then((r) => { document.getElementById('diagInternet').textContent = formatMs(r); });
+}
+
+function closeDiagModal() {
+  document.getElementById('diagModal').classList.remove('open');
+  document.getElementById('diagScrim').classList.remove('open');
+}
+
 function openDrawer() {
   document.getElementById('drawer').classList.add('open');
   document.getElementById('drawerScrim').classList.add('open');
@@ -195,6 +299,9 @@ document.addEventListener('DOMContentLoaded', () => {
   document.querySelector('.sheet-close').addEventListener('click', closeSheet);
   document.getElementById('scrim').addEventListener('click', closeSheet);
   document.querySelector('.icon-btn[title="Menü"]').addEventListener('click', openDrawer);
+  document.getElementById('detailBackBtn').addEventListener('click', closeDetailView);
+  document.getElementById('diagCloseBtn').addEventListener('click', closeDiagModal);
+  document.getElementById('diagScrim').addEventListener('click', closeDiagModal);
   document.getElementById('settingsBtn').addEventListener('click', () => {
     window.location.href = 'settings.html';
   });

@@ -23,19 +23,99 @@
     </div>
 
     <main>
-      <div class="auto-card">
-        <div class="auto-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 3 14h7l-1 8 10-12h-7l1-8Z"/></svg>
+      <div id="listView">
+        <div class="auto-card">
+          <div class="auto-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 3 14h7l-1 8 10-12h-7l1-8Z"/></svg>
+          </div>
+          <div class="auto-copy">
+            <h3 data-i18n="auto.title">Otomatik Mod</h3>
+            <p data-i18n="auto.subtitle">Ethernet bağlandığında Wi-Fi otomatik olarak kapanır</p>
+          </div>
+          <button class="switch" data-on="false"></button>
         </div>
-        <div class="auto-copy">
-          <h3 data-i18n="auto.title">Otomatik Mod</h3>
-          <p data-i18n="auto.subtitle">Ethernet bağlandığında Wi-Fi otomatik olarak kapanır</p>
-        </div>
-        <button class="switch" data-on="false"></button>
+
+        <div class="section-label" data-i18n="section.adapters">Adaptörler</div>
+        <div class="adapter-list"></div>
       </div>
 
-      <div class="section-label" data-i18n="section.adapters">Adaptörler</div>
-      <div class="adapter-list"></div>
+      <div class="detail-view" id="detailView">
+        <div class="detail-header">
+          <button class="icon-btn" id="detailBackBtn">
+            <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+          </button>
+          <div class="adapter-glyph" id="detailGlyph"></div>
+          <h2 id="detailTitle">—</h2>
+        </div>
+
+        <div class="info-card">
+          <div class="info-row">
+            <span class="label" data-i18n="detail.status">Durum</span>
+            <span class="value" id="detailStatus">—</span>
+          </div>
+          <div class="info-row">
+            <span class="label" data-i18n="detail.networkName">Ağ Adı</span>
+            <span class="value" id="detailNetworkName">—</span>
+          </div>
+          <div class="info-row">
+            <span class="label" data-i18n="detail.category">Kategori</span>
+            <span class="value" id="detailCategory">—</span>
+          </div>
+        </div>
+
+        <div class="info-card">
+          <div class="info-row">
+            <span class="label" data-i18n="detail.mac">Mac Adresi</span>
+            <span class="value copyable" id="detailMac" title="Kopyala">—</span>
+          </div>
+        </div>
+
+        <div class="info-card">
+          <div class="info-row">
+            <span class="label" data-i18n="detail.dns">DNS Adresi</span>
+            <span class="value" id="detailDns">—</span>
+          </div>
+          <button class="wifi-scan-btn" id="editIpDnsBtn" data-i18n="detail.edit">Düzenle</button>
+        </div>
+
+        <div class="info-card">
+          <div class="info-row">
+            <span class="label" data-i18n="detail.ip">IP Adresi</span>
+            <span class="value" id="detailIp">—</span>
+          </div>
+          <div class="info-row">
+            <span class="label" data-i18n="detail.gateway">Ağ Geçidi</span>
+            <span class="value" id="detailGateway">—</span>
+          </div>
+          <div class="info-row">
+            <span class="label" data-i18n="detail.ipv6">IPv6 Adresi</span>
+            <span class="value" id="detailIpv6">—</span>
+          </div>
+        </div>
+
+        <div class="info-card">
+          <div class="info-row">
+            <span class="label" data-i18n="detail.download">İndirme Hızı</span>
+            <span class="value" id="detailDownload" data-i18n="detail.measuring">Ölçülüyor…</span>
+          </div>
+          <div class="info-row">
+            <span class="label" data-i18n="detail.upload">Yükleme Hızı</span>
+            <span class="value" id="detailUpload" data-i18n="detail.measuring">Ölçülüyor…</span>
+          </div>
+        </div>
+
+        <div class="info-card">
+          <div class="info-row">
+            <span class="label" data-i18n="detail.ping">Ping Testi</span>
+            <span class="value" id="detailPing" data-i18n="detail.measuring">Ölçülüyor…</span>
+          </div>
+        </div>
+
+        <div class="detail-actions">
+          <button class="wifi-scan-btn" id="modemBtn" data-i18n="detail.modem">Modem Arayüzü</button>
+          <button class="wifi-scan-btn" id="diagnoseBtn" data-i18n="detail.diagnose">Tanıla</button>
+        </div>
+      </div>
     </main>
 
     <footer data-i18n="footer.adminNotice">Yönetici olarak çalışıyor</footer>
@@ -135,6 +215,30 @@
           Ağları Tara
         </button>
         <div class="wifi-list"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="scrim" id="diagScrim"></div>
+  <div class="diag-modal" id="diagModal">
+    <div class="sheet-head">
+      <h2 data-i18n="diag.title">Tanılama</h2>
+      <button class="icon-btn" id="diagCloseBtn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="info-card">
+      <div class="info-row">
+        <span class="label" data-i18n="diag.gatewayDelay">Ağ Geçidi Gecikmesi</span>
+        <span class="value" id="diagGateway" data-i18n="detail.measuring">Ölçülüyor…</span>
+      </div>
+      <div class="info-row">
+        <span class="label" data-i18n="diag.dnsSpeed">DNS Çözümleme Hızı</span>
+        <span class="value" id="diagDns" data-i18n="detail.measuring">Ölçülüyor…</span>
+      </div>
+      <div class="info-row">
+        <span class="label" data-i18n="diag.internetDelay">İnternet Bağlantısı Gecikmesi</span>
+        <span class="value" id="diagInternet" data-i18n="detail.measuring">Ölçülüyor…</span>
       </div>
     </div>
   </div>
