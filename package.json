@@ -15,11 +15,13 @@
   "build": {
     "appId": "com.iksoftware.adaptermanager",
     "productName": "NetworkAdapterManager",
+    "icon": "assets/app-icon.ico",
     "win": {
       "target": "dir",
-      "requestedExecutionLevel": "requireAdmin"
+      "requestedExecutionLevel": "requireAdministrator"
     },
-    "directories": { "output": "publish" }
+    "directories": { "output": "publish" },
+    "files": ["src/**/*", "assets/**/*", "package.json"]
   },
   "devDependencies": {
     "electron": "^43.4.1",
