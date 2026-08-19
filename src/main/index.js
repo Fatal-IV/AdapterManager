@@ -5,6 +5,8 @@ const { getIpConfig, setIpConfig, getProxyConfig, setProxyConfig } = require('./
 const { scanWifi, connectWifi } = require('./services/wifi');
 const { resolveLocale } = require('./services/i18n');
 const { getSettings, setSettings } = require('./settings');
+const { startAutoMode, stopAutoMode, isAutoModeRunning } = require('./autoMode');
+const { createTray } = require('./tray');
 
 ipcMain.on('app:locale', (event) => {
   event.returnValue = resolveLocale(app.getLocale());
@@ -39,6 +41,13 @@ ipcMain.handle('wifi:connect', async (_event, { ssid, password }) => {
   await connectWifi(ssid, password);
 });
 
+ipcMain.handle('autoMode:get', async () => isAutoModeRunning());
+ipcMain.handle('autoMode:set', async (_event, enabled) => {
+  if (enabled) startAutoMode(); else stopAutoMode();
+  setSettings({ autoMode: enabled });
+  return isAutoModeRunning();
+});
+
 let mainWindow = null;
 
 function createWindow() {
@@ -54,6 +63,12 @@ function createWindow() {
     }
   });
   mainWindow.loadFile(path.join(__dirname, '../renderer/index.html'));
+  mainWindow.on('close', (event) => {
+    if (!app.isQuitting) {
+      event.preventDefault();
+      mainWindow.hide();
+    }
+  });
 }
 
 const gotLock = app.requestSingleInstanceLock();
@@ -68,7 +83,13 @@ if (!gotLock) {
     }
   });
 
-  app.whenReady().then(createWindow);
+  app.whenReady().then(() => {
+    createWindow();
+    createTray(mainWindow);
+    if (getSettings().autoMode) startAutoMode();
+  });
+
+  app.on('before-quit', () => { app.isQuitting = true; });
 
   app.on('window-all-closed', () => {
     if (process.platform !== 'darwin') app.quit();

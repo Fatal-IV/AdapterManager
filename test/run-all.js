@@ -3,7 +3,8 @@ const modules = [
   require('./network.test.js'),
   require('./wifi.test.js'),
   require('./i18n.test.js'),
-  require('./settings.test.js')
+  require('./settings.test.js'),
+  require('./autoMode.test.js')
 ];
 
 let failures = 0;

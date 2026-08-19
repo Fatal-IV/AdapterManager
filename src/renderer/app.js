@@ -198,8 +198,11 @@ document.addEventListener('DOMContentLoaded', () => {
   document.querySelector('.drawer .icon-btn').addEventListener('click', closeDrawer);
 
   const autoSwitch = document.querySelector('.auto-card .switch');
-  autoSwitch.addEventListener('click', () => {
-    autoSwitch.dataset.on = autoSwitch.dataset.on === 'true' ? 'false' : 'true';
+  window.api.autoMode.get().then((enabled) => { autoSwitch.dataset.on = String(enabled); });
+  autoSwitch.addEventListener('click', async () => {
+    const next = autoSwitch.dataset.on !== 'true';
+    await window.api.autoMode.set(next);
+    autoSwitch.dataset.on = String(next);
   });
 
   const searchInput = document.querySelector('.search-box input');
