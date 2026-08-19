@@ -69,6 +69,25 @@ ipcMain.handle('autoMode:set', async (_event, enabled) => {
 
 let mainWindow = null;
 
+function createEditWindow(name, type) {
+  const editWindow = new BrowserWindow({
+    width: 480,
+    height: 640,
+    minWidth: 420,
+    minHeight: 480,
+    webPreferences: {
+      preload: path.join(__dirname, '../preload/preload.js'),
+      nodeIntegration: false,
+      contextIsolation: true
+    }
+  });
+  editWindow.loadFile(path.join(__dirname, '../renderer/edit.html'), { query: { name, type } });
+}
+
+ipcMain.handle('editWindow:open', (_event, { name, type }) => {
+  createEditWindow(name, type);
+});
+
 function createWindow() {
   mainWindow = new BrowserWindow({
     width: 960,

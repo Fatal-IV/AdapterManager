@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <title>Adaptör Ayarlarını Düzenle</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app" style="height: 100vh; overflow-y: auto;">
+    <div class="toolbar">
+      <div class="toolbar-title">
+        <div class="adapter-glyph" id="editGlyph"></div>
+        <span id="editTitle">—</span>
+      </div>
+    </div>
+
+    <main>
+      <div style="width: 100%; max-width: 480px; display: flex; flex-direction: column; gap: 16px;">
+        <div class="tabs" id="tabs">
+          <button class="tab active" data-panel="ip" data-i18n="tab.ip">IP / DNS</button>
+          <button class="tab" data-panel="proxy" data-i18n="tab.proxy">Proxy</button>
+          <button class="tab" data-panel="wifi" data-i18n="tab.wifi">Ağlar</button>
+        </div>
+        <div class="tabs-line"></div>
+
+        <div class="panel active" data-panel="ip">
+          <div class="segmented">
+            <button class="active" data-mode="dhcp">Otomatik (DHCP)</button>
+            <button data-mode="manual">Manuel</button>
+          </div>
+          <div class="field-group">
+            <div class="field">
+              <label>IP Adresi</label>
+              <input value="">
+            </div>
+            <div class="field-row">
+              <div class="field">
+                <label>Alt Ağ Maskesi</label>
+                <input value="">
+              </div>
+              <div class="field">
+                <label>Ağ Geçidi</label>
+                <input value="">
+              </div>
+            </div>
+            <div class="field-row">
+              <div class="field">
+                <label>DNS 1</label>
+                <input value="">
+              </div>
+              <div class="field">
+                <label>DNS 2</label>
+                <input value="">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel" data-panel="proxy">
+          <div class="segmented">
+            <button data-mode="proxy-off">Kapalı</button>
+            <button data-mode="proxy-auto">Otomatik Algıla</button>
+            <button data-mode="proxy-manual">Manuel</button>
+          </div>
+          <div class="field-group">
+            <div class="field">
+              <label>Yapılandırma Betiği / Sunucu</label>
+              <input placeholder="http://proxy.sirket.local/proxy.pac">
+            </div>
+          </div>
+        </div>
+
+        <div class="panel" data-panel="wifi">
+          <button class="wifi-scan-btn" data-i18n="wifi.scan">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-9-9"/><path d="M21 3v6h-6"/></svg>
+            Ağları Tara
+          </button>
+          <div class="wifi-list"></div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="i18n.js"></script>
+  <script src="edit.js"></script>
+</body>
+</html>

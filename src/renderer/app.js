@@ -4,7 +4,6 @@ const GLYPHS = {
 };
 
 let currentAdapters = [];
-let activeSheetAdapter = null;
 
 const CATEGORY_LABELS = {
   public: 'detail.categoryPublic',
@@ -30,10 +29,7 @@ function buildAdapterCard(adapter, { compact }) {
   const el = document.createElement('div');
   el.className = compact ? 'drawer-row' : 'adapter-card';
   el.dataset.status = adapter.status;
-  el.onclick = () => {
-    openDetailView(adapter);
-    if (compact) closeDrawer();
-  };
+  el.onclick = () => openDetailView(adapter);
 
   const glyph = document.createElement('div');
   glyph.className = 'adapter-glyph';
@@ -108,79 +104,6 @@ async function refreshAdapters() {
   renderAdapterList(currentAdapters);
 }
 
-function fillIpPanel(cfg) {
-  document.querySelector('.panel[data-panel="ip"] .segmented button[data-mode="dhcp"]')
-    .classList.toggle('active', cfg.dhcp);
-  document.querySelector('.panel[data-panel="ip"] .segmented button[data-mode="manual"]')
-    .classList.toggle('active', !cfg.dhcp);
-  const inputs = document.querySelectorAll('.panel[data-panel="ip"] input');
-  inputs[0].value = cfg.ip || '';
-  inputs[1].value = cfg.subnet || '';
-  inputs[2].value = cfg.gateway || '';
-  inputs[3].value = (cfg.dns && cfg.dns[0]) || '';
-  inputs[4].value = (cfg.dns && cfg.dns[1]) || '';
-}
-
-function fillProxyPanel(cfg) {
-  document.querySelectorAll('.panel[data-panel="proxy"] .segmented button').forEach((b) => b.classList.remove('active'));
-  const map = { off: 'proxy-off', auto: 'proxy-auto', manual: 'proxy-manual' };
-  document.querySelector(`.panel[data-panel="proxy"] .segmented button[data-mode="${map[cfg.mode]}"]`)
-    .classList.add('active');
-  document.querySelector('.panel[data-panel="proxy"] input').value = cfg.autoConfigUrl || cfg.server || '';
-}
-
-async function fillWifiPanel(adapter) {
-  const list = document.querySelector('.wifi-list');
-  list.innerHTML = '<p>Taranıyor…</p>';
-  const networks = await window.api.wifi.scan();
-  list.innerHTML = '';
-  networks.forEach((n) => {
-    const row = document.createElement('div');
-    row.className = 'wifi-row' + (n.connected ? ' connected' : '');
-    row.innerHTML = `<span class="name">${n.ssid}</span>${n.connected ? `<span class="connected-tag">${t('wifi.connected')}</span>` : ''}`;
-    row.onclick = async () => {
-      if (n.connected) return;
-      const password = window.prompt(`"${n.ssid}" için şifre:`);
-      if (password === null) return;
-      await window.api.wifi.connect(n.ssid, password);
-      fillWifiPanel(adapter);
-    };
-    list.appendChild(row);
-  });
-}
-
-async function openEditSheet(adapter) {
-  activeSheetAdapter = adapter;
-  document.getElementById('sheetGlyph').innerHTML = GLYPHS[adapter.type] || GLYPHS.ethernet;
-  document.getElementById('sheetTitle').textContent = adapter.name;
-  document.getElementById('sheetSub').textContent = adapter.mac;
-
-  const tabs = document.getElementById('tabs');
-  const isWifi = adapter.type === 'wifi';
-  tabs.style.display = 'flex';
-  document.querySelector('.tabs-line').style.display = 'block';
-  tabs.querySelector('.tab[data-panel="wifi"]').style.display = isWifi ? '' : 'none';
-
-  document.querySelectorAll('.tab').forEach((t) => t.classList.toggle('active', t.dataset.panel === 'ip'));
-  document.querySelectorAll('.panel').forEach((p) => p.classList.toggle('active', p.dataset.panel === 'ip'));
-
-  const [ipCfg, proxyCfg] = await Promise.all([
-    window.api.network.getIp(adapter.name),
-    window.api.network.getProxy()
-  ]);
-  fillIpPanel(ipCfg);
-  fillProxyPanel(proxyCfg);
-
-  document.getElementById('sheet').classList.add('open');
-  document.getElementById('scrim').classList.add('open');
-}
-
-function closeSheet() {
-  document.getElementById('sheet').classList.remove('open');
-  document.getElementById('scrim').classList.remove('open');
-  activeSheetAdapter = null;
-}
-
 async function findConnectedSsid() {
   try {
     const networks = await window.api.wifi.scan();
@@ -219,7 +142,7 @@ async function openDetailView(adapter) {
   document.getElementById('detailPing').textContent = t('detail.measuring');
 
   document.getElementById('detailMac').onclick = () => copyToClipboard(adapter.mac, document.getElementById('detailMac'));
-  document.getElementById('editIpDnsBtn').onclick = () => openEditSheet(adapter);
+  document.getElementById('editIpDnsBtn').onclick = () => window.api.editWindow.open(adapter.name, adapter.type);
   document.getElementById('modemBtn').onclick = async () => {
     const cfg = await window.api.network.getIp(adapter.name);
     if (cfg.gateway) window.api.network.openGateway(cfg.gateway);
@@ -271,42 +194,17 @@ function closeDiagModal() {
   document.getElementById('diagScrim').classList.remove('open');
 }
 
-function openDrawer() {
-  document.getElementById('drawer').classList.add('open');
-  document.getElementById('drawerScrim').classList.add('open');
-}
-
-function closeDrawer() {
-  document.getElementById('drawer').classList.remove('open');
-  document.getElementById('drawerScrim').classList.remove('open');
-}
-
 document.addEventListener('DOMContentLoaded', () => {
   window.api.settings.get().then((s) => {
     if (s.theme !== 'system') document.documentElement.dataset.theme = s.theme;
   });
 
-  document.querySelectorAll('.tab').forEach((tab) => {
-    tab.addEventListener('click', () => {
-      document.querySelectorAll('.tab').forEach((t) => t.classList.remove('active'));
-      document.querySelectorAll('.panel').forEach((p) => p.classList.remove('active'));
-      tab.classList.add('active');
-      document.querySelector(`.panel[data-panel="${tab.dataset.panel}"]`).classList.add('active');
-      if (tab.dataset.panel === 'wifi' && activeSheetAdapter) fillWifiPanel(activeSheetAdapter);
-    });
-  });
-
-  document.querySelector('.sheet-close').addEventListener('click', closeSheet);
-  document.getElementById('scrim').addEventListener('click', closeSheet);
-  document.querySelector('.icon-btn[title="Menü"]').addEventListener('click', openDrawer);
   document.getElementById('detailBackBtn').addEventListener('click', closeDetailView);
   document.getElementById('diagCloseBtn').addEventListener('click', closeDiagModal);
   document.getElementById('diagScrim').addEventListener('click', closeDiagModal);
   document.getElementById('settingsBtn').addEventListener('click', () => {
     window.location.href = 'settings.html';
   });
-  document.getElementById('drawerScrim').addEventListener('click', closeDrawer);
-  document.querySelector('.drawer .icon-btn').addEventListener('click', closeDrawer);
 
   const autoSwitch = document.querySelector('.auto-card .switch');
   window.api.autoMode.get().then((enabled) => { autoSwitch.dataset.on = String(enabled); });
@@ -317,9 +215,9 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   const searchInput = document.querySelector('.search-box input');
-  const filterButtons = document.querySelectorAll('.drawer .segmented button');
+  const filterButtons = document.querySelectorAll('.sidebar .segmented button');
   function applyDrawerFilter() {
-    const active = document.querySelector('.drawer .segmented button.active');
+    const active = document.querySelector('.sidebar .segmented button.active');
     const filtered = filterAdapters(searchInput.value, active.dataset.filter);
     const drawerList = document.querySelector('.drawer-list');
     drawerList.innerHTML = '';

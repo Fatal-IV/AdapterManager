@@ -38,5 +38,8 @@ contextBridge.exposeInMainWorld('api', {
   updater: {
     check: () => ipcRenderer.invoke('updater:check'),
     apply: (update) => ipcRenderer.invoke('updater:apply', update)
+  },
+  editWindow: {
+    open: (name, type) => ipcRenderer.invoke('editWindow:open', { name, type })
   }
 });
