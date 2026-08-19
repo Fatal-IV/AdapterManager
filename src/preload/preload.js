@@ -25,5 +25,9 @@ contextBridge.exposeInMainWorld('api', {
   autoMode: {
     get: () => ipcRenderer.invoke('autoMode:get'),
     set: (enabled) => ipcRenderer.invoke('autoMode:set', enabled)
+  },
+  updater: {
+    check: () => ipcRenderer.invoke('updater:check'),
+    apply: (update) => ipcRenderer.invoke('updater:apply', update)
   }
 });

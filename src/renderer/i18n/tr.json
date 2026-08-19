@@ -26,5 +26,10 @@
   "settings.autostart": "Windows başlangıcında otomatik başlat",
   "settings.updates": "Güncellemeler",
   "settings.checkUpdates": "Güncellemeleri Denetle",
-  "settings.check": "Denetle"
+  "settings.check": "Denetle",
+  "settings.checking": "Denetleniyor…",
+  "settings.upToDate": "En güncel sürümdesiniz",
+  "settings.updateFound": "Yeni sürüm bulundu:",
+  "settings.confirmUpdate": "Şu sürüme güncellemek istiyor musunuz?",
+  "settings.installing": "İndiriliyor ve kuruluyor…"
 }

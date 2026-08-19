@@ -26,6 +26,22 @@ async function init() {
     autostartSwitch.dataset.on = String(next);
     await window.api.settings.set({ autostart: next });
   });
+
+  document.getElementById('checkUpdateBtn').addEventListener('click', async () => {
+    const statusEl = document.getElementById('updateStatus');
+    statusEl.textContent = t('settings.checking');
+    const update = await window.api.updater.check();
+    if (!update) {
+      statusEl.textContent = t('settings.upToDate');
+      return;
+    }
+    statusEl.textContent = `${t('settings.updateFound')} ${update.version}`;
+    const confirmed = window.confirm(`${t('settings.confirmUpdate')} ${update.version}`);
+    if (confirmed) {
+      statusEl.textContent = t('settings.installing');
+      await window.api.updater.apply(update);
+    }
+  });
 }
 
 init();

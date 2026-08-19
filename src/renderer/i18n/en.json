@@ -26,5 +26,10 @@
   "settings.autostart": "Launch automatically at Windows startup",
   "settings.updates": "Updates",
   "settings.checkUpdates": "Check for Updates",
-  "settings.check": "Check"
+  "settings.check": "Check",
+  "settings.checking": "Checking…",
+  "settings.upToDate": "You're up to date",
+  "settings.updateFound": "New version found:",
+  "settings.confirmUpdate": "Do you want to update to version",
+  "settings.installing": "Downloading and installing…"
 }

@@ -7,6 +7,10 @@ const { resolveLocale } = require('./services/i18n');
 const { getSettings, setSettings } = require('./settings');
 const { startAutoMode, stopAutoMode, isAutoModeRunning } = require('./autoMode');
 const { createTray } = require('./tray');
+const { checkForUpdate, downloadAndInstall } = require('./updater');
+
+ipcMain.handle('updater:check', async () => checkForUpdate());
+ipcMain.handle('updater:apply', async (_event, update) => downloadAndInstall(update));
 
 ipcMain.on('app:locale', (event) => {
   event.returnValue = resolveLocale(app.getLocale());

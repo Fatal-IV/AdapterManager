@@ -4,7 +4,8 @@ const modules = [
   require('./wifi.test.js'),
   require('./i18n.test.js'),
   require('./settings.test.js'),
-  require('./autoMode.test.js')
+  require('./autoMode.test.js'),
+  require('./updater.test.js')
 ];
 
 let failures = 0;
