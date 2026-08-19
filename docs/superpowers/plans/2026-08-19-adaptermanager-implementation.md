@@ -2393,7 +2393,7 @@ Note: `{#MyAppVersion}` must be bumped by hand (or by a small future release scr
 
 ```powershell
 param(
-  [string]$InnoSetupCompiler = "C:\Program Files (x86)\Inno Setup 6\ISCC.exe"
+  [string]$InnoSetupCompiler = "C:\Program Files\Inno Setup 7\ISCC.exe"
 )
 
 Write-Host "1/2 Packaging Electron app..."
