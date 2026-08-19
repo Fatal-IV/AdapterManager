@@ -1,0 +1,656 @@
+<title>NetworkAdapterManager — Arayüz Taslağı</title>
+<style>
+  :root {
+    --bg: #eef1f6;
+    --bg-elevated: #f7f9fc;
+    --surface: #ffffff;
+    --surface-2: #ffffff;
+    --border: rgba(28, 32, 44, 0.08);
+    --text: #1b1f27;
+    --text-2: #5b6472;
+    --text-3: #8a93a3;
+    --accent: #1266f1;
+    --accent-ink: #ffffff;
+    --accent-wash: rgba(18, 102, 241, 0.10);
+    --success: #1fa971;
+    --success-wash: rgba(31, 169, 113, 0.12);
+    --danger: #e0393e;
+    --danger-wash: rgba(224, 57, 62, 0.10);
+    --warning: #c47a12;
+    --shadow-card: 0 1px 2px rgba(20, 24, 32, 0.04), 0 8px 24px -12px rgba(20, 24, 32, 0.12);
+    --shadow-sheet: -16px 0 48px -12px rgba(20, 24, 32, 0.22);
+    --radius-lg: 18px;
+    --radius-md: 13px;
+    --radius-sm: 9px;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #17181c;
+      --bg-elevated: #1e2024;
+      --surface: #232529;
+      --surface-2: #26282d;
+      --border: rgba(255, 255, 255, 0.08);
+      --text: #f0f1f4;
+      --text-2: #a4aab5;
+      --text-3: #767c87;
+      --accent: #4d94ff;
+      --accent-ink: #08152b;
+      --accent-wash: rgba(77, 148, 255, 0.16);
+      --success: #3fce97;
+      --success-wash: rgba(63, 206, 151, 0.14);
+      --danger: #ff6b6f;
+      --danger-wash: rgba(255, 107, 111, 0.14);
+      --warning: #e0a83f;
+      --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 24px -12px rgba(0, 0, 0, 0.5);
+      --shadow-sheet: -16px 0 48px -12px rgba(0, 0, 0, 0.6);
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #17181c; --bg-elevated: #1e2024; --surface: #232529; --surface-2: #26282d;
+    --border: rgba(255, 255, 255, 0.08); --text: #f0f1f4; --text-2: #a4aab5; --text-3: #767c87;
+    --accent: #4d94ff; --accent-ink: #08152b; --accent-wash: rgba(77, 148, 255, 0.16);
+    --success: #3fce97; --success-wash: rgba(63, 206, 151, 0.14);
+    --danger: #ff6b6f; --danger-wash: rgba(255, 107, 111, 0.14); --warning: #e0a83f;
+    --shadow-card: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px -12px rgba(0,0,0,.5);
+    --shadow-sheet: -16px 0 48px -12px rgba(0,0,0,.6);
+    color-scheme: dark;
+  }
+  :root[data-theme="light"] {
+    --bg: #eef1f6; --bg-elevated: #f7f9fc; --surface: #ffffff; --surface-2: #ffffff;
+    --border: rgba(28, 32, 44, 0.08); --text: #1b1f27; --text-2: #5b6472; --text-3: #8a93a3;
+    --accent: #1266f1; --accent-ink: #ffffff; --accent-wash: rgba(18, 102, 241, 0.10);
+    --success: #1fa971; --success-wash: rgba(31, 169, 113, 0.12);
+    --danger: #e0393e; --danger-wash: rgba(224, 57, 62, 0.10); --warning: #c47a12;
+    --shadow-card: 0 1px 2px rgba(20,24,32,.04), 0 8px 24px -12px rgba(20,24,32,.12);
+    --shadow-sheet: -16px 0 48px -12px rgba(20,24,32,.22);
+    color-scheme: light;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font: 400 14px/1.5 "Segoe UI Variable Text", "Segoe UI", -apple-system, system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  .app {
+    max-width: 880px;
+    margin: 0 auto;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Toolbar — translucent material, content scrolls under it */
+  .toolbar {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 28px;
+    background: color-mix(in srgb, var(--bg) 72%, transparent);
+    backdrop-filter: blur(20px) saturate(180%);
+    border-bottom: 1px solid var(--border);
+  }
+  .toolbar-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 15.5px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  .toolbar-mark {
+    width: 26px; height: 26px; border-radius: 8px;
+    background: linear-gradient(155deg, var(--accent), color-mix(in srgb, var(--accent) 60%, #7cc8ff));
+    display: grid; place-items: center;
+    box-shadow: 0 2px 6px color-mix(in srgb, var(--accent) 40%, transparent);
+  }
+  .toolbar-mark svg { width: 15px; height: 15px; }
+  .toolbar-actions { display: flex; align-items: center; gap: 6px; }
+
+  .icon-btn {
+    width: 32px; height: 32px;
+    border-radius: 9px;
+    border: none;
+    background: transparent;
+    color: var(--text-2);
+    display: grid; place-items: center;
+    cursor: pointer;
+    transition: transform 100ms ease-out, background 150ms ease-out;
+  }
+  .icon-btn:hover { background: var(--surface-2); color: var(--text); }
+  .icon-btn:active { transform: scale(0.90); }
+  .icon-btn svg { width: 17px; height: 17px; }
+
+  main {
+    flex: 1;
+    padding: 22px 28px 60px;
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+  }
+
+  /* Otomatik Mod hero card */
+  .auto-card {
+    border-radius: var(--radius-lg);
+    padding: 18px 20px;
+    background: linear-gradient(135deg, var(--accent-wash), transparent 60%), var(--surface);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-card);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .auto-icon {
+    width: 42px; height: 42px; flex: none; border-radius: 12px;
+    background: var(--accent-wash); color: var(--accent);
+    display: grid; place-items: center;
+  }
+  .auto-icon svg { width: 22px; height: 22px; }
+  .auto-copy { flex: 1; min-width: 0; }
+  .auto-copy h3 { margin: 0 0 2px; font-size: 14.5px; font-weight: 650; letter-spacing: -0.01em; }
+  .auto-copy p { margin: 0; font-size: 12.5px; color: var(--text-2); }
+
+  /* Switch */
+  .switch {
+    --w: 42px; --h: 25px; --pad: 3px;
+    width: var(--w); height: var(--h);
+    border-radius: 999px;
+    background: var(--border);
+    position: relative;
+    flex: none;
+    border: none;
+    cursor: pointer;
+    transition: background 180ms ease-out;
+  }
+  .switch[data-on="true"] { background: var(--success); }
+  .switch::after {
+    content: "";
+    position: absolute;
+    top: var(--pad); left: var(--pad);
+    width: calc(var(--h) - var(--pad) * 2);
+    height: calc(var(--h) - var(--pad) * 2);
+    border-radius: 50%;
+    background: #fff;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.25);
+    transition: transform 220ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .switch[data-on="true"]::after { transform: translateX(calc(var(--w) - var(--h))); }
+  .switch:active::after { width: calc(var(--h) - var(--pad) * 2 + 4px); }
+
+  .section-label {
+    font-size: 12px; font-weight: 650; text-transform: uppercase; letter-spacing: 0.05em;
+    color: var(--text-3); margin: 4px 2px -6px;
+  }
+
+  .adapter-list { display: flex; flex-direction: column; gap: 10px; }
+
+  .adapter-card {
+    display: flex; align-items: center; gap: 14px;
+    padding: 14px 16px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-card);
+    cursor: pointer;
+    transition: transform 100ms ease-out, border-color 150ms ease-out;
+  }
+  .adapter-card:hover { border-color: color-mix(in srgb, var(--accent) 35%, var(--border)); }
+  .adapter-card:active { transform: scale(0.992); }
+
+  .adapter-glyph {
+    width: 40px; height: 40px; flex: none; border-radius: 11px;
+    display: grid; place-items: center;
+    background: var(--surface-2);
+    color: var(--text-2);
+  }
+  .adapter-glyph svg { width: 20px; height: 20px; }
+  .adapter-card[data-status="up"] .adapter-glyph { background: var(--success-wash); color: var(--success); }
+  .adapter-card[data-status="down"] .adapter-glyph { background: var(--danger-wash); color: var(--danger); }
+
+  .adapter-info { flex: 1; min-width: 0; }
+  .adapter-name-row { display: flex; align-items: center; gap: 7px; }
+  .adapter-name { font-size: 14px; font-weight: 600; letter-spacing: -0.005em; }
+  .status-dot { width: 7px; height: 7px; border-radius: 50%; flex: none; }
+  .adapter-card[data-status="up"] .status-dot { background: var(--success); box-shadow: 0 0 0 3px var(--success-wash); }
+  .adapter-card[data-status="down"] .status-dot { background: var(--danger); box-shadow: 0 0 0 3px var(--danger-wash); }
+  .adapter-card[data-status="idle"] .status-dot { background: var(--text-3); }
+
+  .adapter-meta { margin-top: 2px; font-size: 12px; color: var(--text-2); display: flex; gap: 10px; }
+  .adapter-meta span { display: flex; align-items: center; gap: 4px; font-variant-numeric: tabular-nums; }
+
+  .chevron { color: var(--text-3); flex: none; transition: transform 150ms ease-out; }
+  .adapter-card:hover .chevron { transform: translateX(2px); color: var(--text-2); }
+
+  /* Detail sheet */
+  .scrim {
+    position: fixed; inset: 0; background: rgba(10, 12, 16, 0.32);
+    opacity: 0; pointer-events: none; transition: opacity 260ms ease-out; z-index: 20;
+  }
+  .scrim.open { opacity: 1; pointer-events: auto; }
+
+  .sheet {
+    position: fixed; top: 0; right: 0; height: 100%;
+    width: min(380px, 92vw);
+    background: var(--bg-elevated);
+    border-left: 1px solid var(--border);
+    box-shadow: var(--shadow-sheet);
+    transform: translateX(100%);
+    transition: transform 340ms cubic-bezier(0.32, 0.72, 0, 1);
+    z-index: 21;
+    display: flex; flex-direction: column;
+  }
+  .sheet.open { transform: translateX(0); }
+
+  .sheet-head {
+    display: flex; align-items: center; gap: 12px;
+    padding: 18px 20px; border-bottom: 1px solid var(--border);
+  }
+  .sheet-head .adapter-glyph { width: 36px; height: 36px; }
+  .sheet-head h2 { margin: 0; font-size: 15.5px; font-weight: 650; letter-spacing: -0.01em; }
+  .sheet-head p { margin: 1px 0 0; font-size: 12px; color: var(--text-2); }
+  .sheet-close { margin-left: auto; }
+
+  .tabs {
+    display: flex; gap: 4px; padding: 12px 20px 0;
+  }
+  .tab {
+    border: none; background: transparent; padding: 8px 4px;
+    font-size: 12.5px; font-weight: 600; color: var(--text-3);
+    cursor: pointer; position: relative; flex: 1; text-align: center;
+    transition: color 150ms ease-out;
+  }
+  .tab.active { color: var(--accent); }
+  .tab::after {
+    content: ""; position: absolute; left: 10%; right: 10%; bottom: -1px; height: 2px;
+    background: var(--accent); border-radius: 2px;
+    transform: scaleX(0); transition: transform 220ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .tab.active::after { transform: scaleX(1); }
+  .tabs-line { border-bottom: 1px solid var(--border); margin: 0 20px; }
+
+  .sheet-body { padding: 18px 20px 24px; overflow-y: auto; flex: 1; }
+  .panel { display: none; flex-direction: column; gap: 16px; }
+  .panel.active { display: flex; }
+
+  .segmented {
+    display: flex; padding: 3px; border-radius: 10px; background: var(--surface-2); border: 1px solid var(--border);
+  }
+  .segmented button {
+    flex: 1; border: none; background: transparent; padding: 7px 0; border-radius: 7px;
+    font-size: 12.5px; font-weight: 600; color: var(--text-2); cursor: pointer;
+    transition: background 150ms ease-out, color 150ms ease-out;
+  }
+  .segmented button.active { background: var(--surface); color: var(--text); box-shadow: var(--shadow-card); }
+
+  .field-group { display: flex; flex-direction: column; gap: 10px; }
+  .field { display: flex; flex-direction: column; gap: 5px; }
+  .field label { font-size: 11.5px; font-weight: 650; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.04em; }
+  .field input {
+    border: 1px solid var(--border); background: var(--surface); color: var(--text);
+    border-radius: 9px; padding: 9px 11px; font-size: 13px; font-variant-numeric: tabular-nums;
+    font-family: inherit; outline: none; transition: border-color 150ms ease-out, box-shadow 150ms ease-out;
+  }
+  .field input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-wash); }
+  .field input:disabled { color: var(--text-3); background: var(--surface-2); }
+  .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+  .wifi-scan-btn {
+    display: flex; align-items: center; justify-content: center; gap: 7px;
+    border: 1px solid var(--border); background: var(--surface); color: var(--text);
+    border-radius: 9px; padding: 9px; font-size: 12.5px; font-weight: 600; cursor: pointer;
+    transition: transform 100ms ease-out, border-color 150ms ease-out;
+  }
+  .wifi-scan-btn:hover { border-color: color-mix(in srgb, var(--accent) 40%, var(--border)); }
+  .wifi-scan-btn:active { transform: scale(0.97); }
+  .wifi-scan-btn svg { width: 14px; height: 14px; }
+
+  .wifi-list { display: flex; flex-direction: column; gap: 8px; }
+  .wifi-row {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 12px; border-radius: 10px; border: 1px solid var(--border); background: var(--surface);
+    cursor: pointer; transition: border-color 150ms ease-out, transform 100ms ease-out;
+  }
+  .wifi-row:hover { border-color: color-mix(in srgb, var(--accent) 35%, var(--border)); }
+  .wifi-row:active { transform: scale(0.99); }
+  .wifi-row.connected { border-color: var(--accent); background: var(--accent-wash); }
+  .wifi-row .name { flex: 1; font-size: 13px; font-weight: 600; }
+  .wifi-row .connected-tag { font-size: 11px; font-weight: 650; color: var(--accent); }
+  .wifi-row svg.signal { width: 16px; height: 16px; color: var(--text-2); }
+  .wifi-row svg.lock { width: 13px; height: 13px; color: var(--text-3); }
+
+  footer {
+    padding: 14px 28px 22px; text-align: center; font-size: 11.5px; color: var(--text-3);
+  }
+
+  /* Sidebar drawer — enters/exits from the left, same edge it's anchored to */
+  .drawer {
+    position: fixed; top: 0; left: 0; height: 100%;
+    width: min(320px, 88vw);
+    background: var(--bg-elevated);
+    border-right: 1px solid var(--border);
+    box-shadow: 16px 0 48px -12px rgba(20, 24, 32, 0.22);
+    transform: translateX(-100%);
+    transition: transform 340ms cubic-bezier(0.32, 0.72, 0, 1);
+    z-index: 21;
+    display: flex; flex-direction: column;
+  }
+  .drawer.open { transform: translateX(0); }
+
+  .drawer-head {
+    display: flex; align-items: center; gap: 10px;
+    padding: 16px 16px 12px;
+  }
+  .drawer-head h2 { margin: 0; font-size: 14.5px; font-weight: 650; letter-spacing: -0.01em; flex: 1; }
+
+  .search-box {
+    margin: 0 16px 12px;
+    display: flex; align-items: center; gap: 8px;
+    padding: 8px 11px;
+    border-radius: 10px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+  }
+  .search-box svg { width: 15px; height: 15px; color: var(--text-3); flex: none; }
+  .search-box input {
+    border: none; background: transparent; outline: none; color: var(--text);
+    font-size: 13px; font-family: inherit; width: 100%;
+  }
+  .search-box input::placeholder { color: var(--text-3); }
+
+  .drawer .segmented { margin: 0 16px 14px; }
+
+  .drawer-list {
+    flex: 1; overflow-y: auto;
+    padding: 0 10px 16px;
+    display: flex; flex-direction: column; gap: 4px;
+  }
+  .drawer-row {
+    display: flex; align-items: center; gap: 10px;
+    padding: 9px 10px;
+    border-radius: 9px;
+    cursor: pointer;
+    transition: background 120ms ease-out;
+  }
+  .drawer-row:hover { background: var(--surface-2); }
+  .drawer-row .adapter-glyph { width: 30px; height: 30px; border-radius: 8px; }
+  .drawer-row .adapter-glyph svg { width: 15px; height: 15px; }
+  .drawer-row-info { flex: 1; min-width: 0; }
+  .drawer-row-name { font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 6px; }
+  .drawer-row-meta { font-size: 11.5px; color: var(--text-2); margin-top: 1px; }
+  .drawer-row .status-dot { width: 6px; height: 6px; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .sheet, .drawer { transition: opacity 200ms ease; transform: none; opacity: 0; }
+    .sheet.open, .drawer.open { opacity: 1; }
+    * { animation-duration: 0.001ms !important; }
+  }
+</style>
+
+<div class="app">
+  <div class="toolbar">
+    <div class="toolbar-title">
+      <button class="icon-btn" title="Menü" onclick="openDrawer()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+      </button>
+      <div class="toolbar-mark">
+        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round"><path d="M4 8 L12 3 L20 8"/><path d="M4 8 L4 16 L12 21 L20 16 L20 8"/><path d="M12 21 L12 12"/><path d="M4 8 L12 12 L20 8"/></svg>
+      </div>
+      <span>NetworkAdapterManager</span>
+    </div>
+    <div class="toolbar-actions">
+      <button class="icon-btn" title="Ayarlar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <main>
+    <div class="auto-card">
+      <div class="auto-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 3 14h7l-1 8 10-12h-7l1-8Z"/></svg>
+      </div>
+      <div class="auto-copy">
+        <h3>Otomatik Mod</h3>
+        <p>Ethernet bağlandığında Wi-Fi otomatik olarak kapanır</p>
+      </div>
+      <button class="switch" data-on="true" onclick="this.dataset.on = this.dataset.on === 'true' ? 'false' : 'true'"></button>
+    </div>
+
+    <div class="section-label">Adaptörler</div>
+    <div class="adapter-list">
+      <div class="adapter-card" data-status="up" onclick="openSheet('eth')">
+        <div class="adapter-glyph">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="10" rx="2"/><path d="M9 7V4a1 1 0 0 1 1-1h1M15 7V4a1 1 0 0 0-1-1h-1"/><path d="M7 17v2M17 17v2"/></svg>
+        </div>
+        <div class="adapter-info">
+          <div class="adapter-name-row">
+            <span class="adapter-name">Ethernet</span>
+            <span class="status-dot"></span>
+          </div>
+          <div class="adapter-meta">
+            <span>Bağlı · Ofis-LAN</span>
+            <span>A4:83:E7:2C:11:0F</span>
+          </div>
+        </div>
+        <button class="switch" data-on="true" onclick="event.stopPropagation(); this.dataset.on = this.dataset.on === 'true' ? 'false' : 'true'"></button>
+        <svg class="chevron" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+      </div>
+
+      <div class="adapter-card" data-status="down" onclick="openSheet('wifi')">
+        <div class="adapter-glyph">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5a11 11 0 0 1 14 0"/><path d="M8.2 16a6.5 6.5 0 0 1 7.6 0"/><path d="M11.5 19.5h1"/></svg>
+        </div>
+        <div class="adapter-info">
+          <div class="adapter-name-row">
+            <span class="adapter-name">Wi-Fi</span>
+            <span class="status-dot"></span>
+          </div>
+          <div class="adapter-meta">
+            <span>Devre dışı</span>
+            <span>C0:18:50:3A:9B:22</span>
+          </div>
+        </div>
+        <button class="switch" data-on="false" onclick="event.stopPropagation(); this.dataset.on = this.dataset.on === 'true' ? 'false' : 'true'"></button>
+        <svg class="chevron" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+      </div>
+    </div>
+  </main>
+
+  <footer>NetworkAdapterManager v0.1 · Yönetici olarak çalışıyor</footer>
+</div>
+
+<div class="drawer" id="drawer">
+  <div class="drawer-head">
+    <h2>Adaptörler</h2>
+    <button class="icon-btn" onclick="closeDrawer()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+    </button>
+  </div>
+  <div class="search-box">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+    <input type="text" placeholder="Adaptör ara…">
+  </div>
+  <div class="segmented">
+    <button class="active" data-filter="all">Tümü</button>
+    <button data-filter="active">Aktif</button>
+    <button data-filter="inactive">Pasif</button>
+  </div>
+  <div class="drawer-list">
+    <div class="drawer-row" onclick="openSheet('eth'); closeDrawer();">
+      <div class="adapter-glyph" data-status="up">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="10" rx="2"/><path d="M9 7V4a1 1 0 0 1 1-1h1M15 7V4a1 1 0 0 0-1-1h-1"/><path d="M7 17v2M17 17v2"/></svg>
+      </div>
+      <div class="drawer-row-info">
+        <div class="drawer-row-name">Ethernet <span class="status-dot" style="background:var(--success)"></span></div>
+        <div class="drawer-row-meta">Bağlı · Ofis-LAN</div>
+      </div>
+    </div>
+    <div class="drawer-row" onclick="openSheet('wifi'); closeDrawer();">
+      <div class="adapter-glyph" data-status="down">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5a11 11 0 0 1 14 0"/><path d="M8.2 16a6.5 6.5 0 0 1 7.6 0"/><path d="M11.5 19.5h1"/></svg>
+      </div>
+      <div class="drawer-row-info">
+        <div class="drawer-row-name">Wi-Fi <span class="status-dot" style="background:var(--danger)"></span></div>
+        <div class="drawer-row-meta">Devre dışı</div>
+      </div>
+    </div>
+    <div class="drawer-row" onclick="openSheet('eth'); closeDrawer();">
+      <div class="adapter-glyph" data-status="down">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a5 5 0 0 0-5 5v3H6a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7a2 2 0 0 0-2-2h-1V7a5 5 0 0 0-5-5Zm3 8H9V7a3 3 0 0 1 6 0Z"/></svg>
+      </div>
+      <div class="drawer-row-info">
+        <div class="drawer-row-name">VPN Adaptörü <span class="status-dot" style="background:var(--text-3)"></span></div>
+        <div class="drawer-row-meta">Bağlı değil</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="scrim" id="drawerScrim" onclick="closeDrawer()"></div>
+<div class="scrim" id="scrim" onclick="closeSheet()"></div>
+<div class="sheet" id="sheet">
+  <div class="sheet-head">
+    <div class="adapter-glyph" id="sheetGlyph"></div>
+    <div>
+      <h2 id="sheetTitle">Wi-Fi</h2>
+      <p id="sheetSub">C0:18:50:3A:9B:22</p>
+    </div>
+    <button class="icon-btn sheet-close" onclick="closeSheet()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+    </button>
+  </div>
+
+  <div class="tabs" id="tabs">
+    <button class="tab active" data-panel="ip">IP / DNS</button>
+    <button class="tab" data-panel="proxy">Proxy</button>
+    <button class="tab" data-panel="wifi">Ağlar</button>
+  </div>
+  <div class="tabs-line"></div>
+
+  <div class="sheet-body">
+    <div class="panel active" data-panel="ip">
+      <div class="segmented">
+        <button class="active" data-mode="dhcp">Otomatik (DHCP)</button>
+        <button data-mode="manual">Manuel</button>
+      </div>
+      <div class="field-group">
+        <div class="field">
+          <label>IP Adresi</label>
+          <input value="192.168.1.42" disabled>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label>Alt Ağ Maskesi</label>
+            <input value="255.255.255.0" disabled>
+          </div>
+          <div class="field">
+            <label>Ağ Geçidi</label>
+            <input value="192.168.1.1" disabled>
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label>DNS 1</label>
+            <input value="8.8.8.8" disabled>
+          </div>
+          <div class="field">
+            <label>DNS 2</label>
+            <input value="8.8.4.4" disabled>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel" data-panel="proxy">
+      <div class="segmented">
+        <button data-mode="proxy-off">Kapalı</button>
+        <button class="active" data-mode="proxy-auto">Otomatik Algıla</button>
+        <button data-mode="proxy-manual">Manuel</button>
+      </div>
+      <div class="field-group">
+        <div class="field">
+          <label>Yapılandırma Betiği (isteğe bağlı)</label>
+          <input placeholder="http://proxy.sirket.local/proxy.pac" disabled>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel" data-panel="wifi">
+      <button class="wifi-scan-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-9-9"/><path d="M21 3v6h-6"/></svg>
+        Ağları Tara
+      </button>
+      <div class="wifi-list">
+        <div class="wifi-row connected">
+          <svg class="signal" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M2 8.5a15 15 0 0 1 20 0M6 12a10 10 0 0 1 12 0M10 15.5a5 5 0 0 1 4 0"/><circle cx="12" cy="19" r="1"/></svg>
+          <span class="name">Ofis-LAN-5G</span>
+          <svg class="lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+          <span class="connected-tag">Bağlı</span>
+        </div>
+        <div class="wifi-row">
+          <svg class="signal" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 12a10 10 0 0 1 12 0M10 15.5a5 5 0 0 1 4 0"/><circle cx="12" cy="19" r="1"/></svg>
+          <span class="name">Misafir-WiFi</span>
+          <svg class="lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+        </div>
+        <div class="wifi-row">
+          <svg class="signal" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M10 15.5a5 5 0 0 1 4 0"/><circle cx="12" cy="19" r="1"/></svg>
+          <span class="name">iPhone'un Kişisel Erişim Noktası</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function openSheet(kind) {
+    const glyphs = {
+      eth: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="10" rx="2"/><path d="M9 7V4a1 1 0 0 1 1-1h1M15 7V4a1 1 0 0 0-1-1h-1"/><path d="M7 17v2M17 17v2"/></svg>',
+      wifi: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5a11 11 0 0 1 14 0"/><path d="M8.2 16a6.5 6.5 0 0 1 7.6 0"/><path d="M11.5 19.5h1"/></svg>'
+    };
+    document.getElementById('sheetGlyph').innerHTML = glyphs[kind];
+    document.getElementById('sheetTitle').textContent = kind === 'eth' ? 'Ethernet' : 'Wi-Fi';
+    document.getElementById('sheetSub').textContent = kind === 'eth' ? 'A4:83:E7:2C:11:0F' : 'C0:18:50:3A:9B:22';
+    document.getElementById('tabs').style.display = kind === 'eth' ? 'none' : 'flex';
+    document.querySelector('.tabs-line').style.display = kind === 'eth' ? 'none' : 'block';
+    document.getElementById('sheet').classList.add('open');
+    document.getElementById('scrim').classList.add('open');
+  }
+  function closeSheet() {
+    document.getElementById('sheet').classList.remove('open');
+    document.getElementById('scrim').classList.remove('open');
+  }
+  function openDrawer() {
+    document.getElementById('drawer').classList.add('open');
+    document.getElementById('drawerScrim').classList.add('open');
+  }
+  function closeDrawer() {
+    document.getElementById('drawer').classList.remove('open');
+    document.getElementById('drawerScrim').classList.remove('open');
+  }
+  document.querySelectorAll('.tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+      tab.classList.add('active');
+      document.querySelector(`.panel[data-panel="${tab.dataset.panel}"]`).classList.add('active');
+    });
+  });
+  document.querySelectorAll('.segmented').forEach(seg => {
+    seg.querySelectorAll('button').forEach(btn => {
+      btn.addEventListener('click', () => {
+        seg.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+      });
+    });
+  });
+</script>
