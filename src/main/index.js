@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain } = require('electron');
+const { app, BrowserWindow, ipcMain, Menu } = require('electron');
 const path = require('path');
 const { listAdapters, toggleAdapter } = require('./services/adapters');
 const { getIpConfig, setIpConfig, getProxyConfig, setProxyConfig } = require('./services/network');
@@ -88,6 +88,7 @@ if (!gotLock) {
   });
 
   app.whenReady().then(() => {
+    Menu.setApplicationMenu(null);
     createWindow();
     createTray(mainWindow);
     if (getSettings().autoMode) startAutoMode();
